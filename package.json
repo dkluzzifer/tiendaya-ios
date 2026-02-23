@@ -1,0 +1,20 @@
+{
+  "name": "tiendaya-ios",
+  "version": "1.0.0",
+  "description": "App iOS para Tiendaya",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx cap sync ios",
+    "open": "npx cap open ios"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
