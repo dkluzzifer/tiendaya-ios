@@ -42,8 +42,8 @@ jobs:
       run: |
         cd ios/App
         mkdir -p output
-        PRODUCT_DIR="$HOME/Library/Developer/Xcode/DerivedData/App-*/Build/Products/Debug-iphonesimulator"
-        APP_PATH=$(ls -d $PRODUCT_DIR/App.app 2>/dev/null | head -1)
+        PRODUCT_DIR="$HOME/Library/Developer/Xcode/DerivedData"
+        APP_PATH=$(find "$PRODUCT_DIR" -name "App.app" -type d -path "*Debug-iphonesimulator*" 2>/dev/null | head -1)
         if [ -d "$APP_PATH" ]; then
           cp -r "$APP_PATH" output/App.app
           cd output
@@ -51,7 +51,7 @@ jobs:
           ls -la
         else
           echo "Build product not found"
-          ls -la ~/Library/Developer/Xcode/DerivedData/
+          find "$PRODUCT_DIR" -name "App.app" -type d 2>/dev/null
           exit 1
         fi
     
