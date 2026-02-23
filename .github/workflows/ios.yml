@@ -19,7 +19,10 @@ jobs:
         node-version: '20'
     
     - name: Install npm dependencies
-      run: npm ci
+      run: npm install
+    
+    - name: Add iOS platform
+      run: npx cap add ios
     
     - name: Install iOS dependencies
       run: |
@@ -30,17 +33,17 @@ jobs:
     - name: Build iOS App
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15' build CODE_SIGNING_ALLOWED=NO 2>&1 | tail -20
+        xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -destination 'generic/platform=iOS Simulator' build CODE_SIGNING_ALLOWED=NO 2>&1 | tail -30
     
     - name: Create IPA
       run: |
         cd ios/App
-        xcodebuild -exportArchive -archive_path build/Build/Products/Debug-iphonesimulator/App.app -export_path output -exportOptionsPlist ExportOptions.plist CODE_SIGNING_ALLOWED=NO 2>&1 || echo "IPA creation skipped - simulator build"
+        xcodebuild -exportArchive -archive_path build/Build/Products/Debug-iphonesimulator/App.app -export_path output -exportOptionsPlist ExportOptions.plist CODE_SIGNING_ALLOWED=NO 2>&1 || echo "Building for simulator only"
     
     - name: Upload IPA
       if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: tiendaya-ios.ipa
+        name: tiendaya-ios
         path: ios/App/output/App.ipa
         retention-days: 30
