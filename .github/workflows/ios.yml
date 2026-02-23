@@ -21,6 +21,9 @@ jobs:
     - name: Install npm dependencies
       run: npm install
     
+    - name: Fix permissions
+      run: chmod +x node_modules/.bin/* || true
+    
     - name: Generate iOS project
       run: npx cap add ios
     
