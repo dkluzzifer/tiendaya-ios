@@ -34,18 +34,29 @@ jobs:
       shell: bash
     
     - name: Build iOS App (Simulator)
+      id: build
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -destination 'generic/platform=iOS Simulator' build CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
+        xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -destination 'generic/platform=iOS Simulator' build CODE_SIGNING_ALLOWED=NO 2>&1
+      shell: bash
+    
+    - name: Check build output
+      run: |
+        ls -la ios/App/build/Build/Products/Debug-iphonesimulator/ 2>/dev/null || echo "Build directory not found"
     
     - name: Create simulator package
       run: |
         cd ios/App
         mkdir -p output
-        cp -r build/Build/Products/Debug-iphonesimulator/App.app output/
-        cd output
-        zip -r App.zip App.app
-        ls -la
+        if [ -d "build/Build/Products/Debug-iphonesimulator/App.app" ]; then
+          cp -r build/Build/Products/Debug-iphonesimulator/App.app output/
+          cd output
+          zip -r App.zip App.app
+          ls -la
+        else
+          echo "Build failed - no App.app found"
+          exit 1
+        fi
     
     - name: Upload App
       if: success()
