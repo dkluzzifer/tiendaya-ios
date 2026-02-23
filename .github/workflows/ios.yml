@@ -34,32 +34,24 @@ jobs:
       shell: bash
     
     - name: Build iOS App (Simulator)
-      id: build
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' build CODE_SIGNING_ALLOWED=NO 2>&1 | tee build.log
-      shell: bash
-    
-    - name: Upload build log
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-log
-        path: ios/App/build.log
-        retention-days: 7
+        xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' build CODE_SIGNING_ALLOWED=NO 2>&1 | tail -30
     
     - name: Create simulator package
       run: |
         cd ios/App
         mkdir -p output
-        if [ -d "build/Build/Products/Debug-iphonesimulator/App.app" ]; then
-          cp -r build/Build/Products/Debug-iphonesimulator/App.app output/
+        PRODUCT_DIR="$HOME/Library/Developer/Xcode/DerivedData/App-*/Build/Products/Debug-iphonesimulator"
+        APP_PATH=$(ls -d $PRODUCT_DIR/App.app 2>/dev/null | head -1)
+        if [ -d "$APP_PATH" ]; then
+          cp -r "$APP_PATH" output/App.app
           cd output
           zip -r App.zip App.app
           ls -la
         else
-          echo "=== Build failed - checking products ==="
-          find build -name "*.app" 2>/dev/null || echo "No .app files found"
-          cat build.log | tail -100
+          echo "Build product not found"
+          ls -la ~/Library/Developer/Xcode/DerivedData/
           exit 1
         fi
     
